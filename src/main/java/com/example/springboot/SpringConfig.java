@@ -1,5 +1,6 @@
 package com.example.springboot;
 
+import com.example.springboot.aop.TimeTraceAop;
 import com.example.springboot.repository.JpaMemberRepository;
 import com.example.springboot.repository.MemberRepository;
 import com.example.springboot.service.MemberService;
@@ -34,6 +35,11 @@ public class SpringConfig {
     @Bean
     public MemberService memberService(){
         return new MemberService(memberRepository);
+    }
+
+    @Bean
+    public TimeTraceAop timeTraceAop() {
+        return new TimeTraceAop();
     }
 
     //@Bean
