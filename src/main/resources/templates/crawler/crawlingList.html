@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        const crawlerStart = () => {
+          $.ajax({
+             type: "POST",
+              url: "/crawler/getCrawlerData",
+              dataType: "text",
+              contentType : "application/x-www-form-urlencoded;charset=UTF-8",
+              success: function(data) {
+                  console.log("통신데이터 값 : " + data);
+              },
+              error: function() {
+                  console.log('통신실패!!');
+              }
+          });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <a href="/">home</a>
+            <button onclick="crawlerStart()">크롤링 시작</button>
+        </div>
+        <div>
+            <table>
+                <thead>
+                <tr>
+                    <th>제목</th>
+                    <th>연관단어</th>
+                    <th>이미지</th>
+                    <th>링크</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="crawler : ${crawler}">
+                    <td th:text="${crawler.title}"></td>
+                    <td th:text="${crawler.keyList}"></td>
+                    <td th:text="${crawler.imgLink}"></td>
+                    <td th:text="${crawler.urlLink}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
