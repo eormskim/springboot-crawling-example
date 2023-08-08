@@ -5,3 +5,20 @@ create table member
     name varchar(255),
     primary key(id)
 );
+
+drop table if exists crawler CASCADE;
+create table crawler
+(
+    url varchar2,
+    img varchar2,
+    title varchar2,
+    primary key(url)
+);
+
+drop table if exists keywords CASCADE;
+create table keywords
+(
+    word varchar2,
+    count bigint,
+    primary key(word)
+);
