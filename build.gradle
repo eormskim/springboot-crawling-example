@@ -20,6 +20,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //크롤링을 위해 jsoup 추가
+    implementation 'org.jsoup:jsoup:1.16.1'
 }
 
 tasks.named('test') {
