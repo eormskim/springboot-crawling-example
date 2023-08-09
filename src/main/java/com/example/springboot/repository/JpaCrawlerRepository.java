@@ -2,6 +2,8 @@ package com.example.springboot.repository;
 
 import com.example.springboot.domain.Crawler;
 import com.example.springboot.domain.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -33,9 +35,10 @@ public class JpaCrawlerRepository implements CrawlerRepository{
         return result.stream().findAny();
     }
 
+
     @Override
-    public List<Crawler> findAll() {
-        return em.createQuery("select d from Crawler d", Crawler.class)
+    public Page<Crawler> findAll(Pageable pageable) {
+        return (Page<Crawler>) em.createQuery("select d from Crawler d", Crawler.class)
                 .getResultList();
     }
 }

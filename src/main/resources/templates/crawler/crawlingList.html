@@ -10,6 +10,7 @@
               dataType: "text",
               contentType : "application/x-www-form-urlencoded;charset=UTF-8",
               success: function(data) {
+                  window.location.href = "/crawler";
                   console.log("통신데이터 값 : " + data);
               },
               error: function() {
@@ -20,30 +21,50 @@
     </script>
 </head>
 <body>
-    <div class="container">
-        <div>
-            <a href="/">home</a>
-            <button onclick="crawlerStart()">크롤링 시작</button>
-        </div>
-        <div>
-            <table>
-                <thead>
-                <tr>
-                    <th>제목</th>
-                    <th>링크</th>
-                    <th>연관단어</th>
-                    <th>이미지</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="crawler : ${crawler}">
-                    <td th:text="${crawler.title}"></td>
-                    <td><a th:href="@{https://entertain.naver.com(${crawler.url})}"></a>ddd</td>
-                    <td><img th:src="${crawler.img}" alt="첨부이미지" th:if="${crawler.img != null}"/></td>
-                    <td></td>
-                </tr>
-                </tbody>
-            </table>
+    <div layout:fragment="content" class="content">
+        <input type="hidden" id="pageNo" th:value="${pageNo}" />
+        <div class="container">
+            <div>
+                <a href="/">home</a>
+                <button onclick="crawlerStart()">크롤링 시작</button>
+            </div>
+            <br />
+
+            <form>
+                <table class="table table-hover">
+                    <colgroup>
+                        <col width="10%" />
+                        <col width="50%" />
+                        <col width="10%" />
+                        <col width="10%" />
+                        <col width="10%" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>이미지</th>
+                        <th>제목</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${totalPage == 0}">
+                        <td colspan="5" style="text-align:center">조회된 리스트가 없습니다.</td>
+                    </tr>
+
+                    <tr th:each="list, index : ${crawler}">
+                        <td><img th:src="${list.img}" alt="첨부이미지" th:if="${list.img != null}"/></td>
+                        <td><a th:text="${list.title}" th:href="@{${list.url}}"></a></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div th:if="${totalPage != 0}" class="text-center">
+                    <ul class="pagination">
+                        <li th:each="page : ${#numbers.sequence(0, totalPage - 1)}">
+                            <a th:classappend="${pageStat.index == pageNo} ? on" th:href="@{/crawler(page=${pageStat.index})}" th:text="${pageStat.index + 1}"></a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
         </div>
     </div>
 </body>

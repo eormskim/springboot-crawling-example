@@ -1,7 +1,10 @@
 package com.example.springboot.domain;
 
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class Crawler {
@@ -11,7 +14,11 @@ public class Crawler {
 
     @Column
     private String img;
+    @Column
     private String title;
+
+    @CreationTimestamp
+    private LocalDateTime regDate;
 
     public String getUrl() {
         return url;
@@ -35,5 +42,13 @@ public class Crawler {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public LocalDateTime getRegDate() {
+        return regDate;
+    }
+
+    public void setRegDate(LocalDateTime regDate) {
+        this.regDate = regDate;
     }
 }

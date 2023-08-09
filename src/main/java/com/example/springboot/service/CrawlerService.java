@@ -4,8 +4,13 @@ import com.example.springboot.domain.Crawler;
 import com.example.springboot.repository.CrawlerRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
+import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +34,8 @@ public class CrawlerService {
      * @return
      */
     public ArrayList crawling(){
-        String[] url = {"https://entertain.naver.com/now"};
+        String entertainLink = "https://entertain.naver.com";
+        String[] url = {entertainLink +"/now"};
         Stream<String> urlStream = Arrays.stream(url);
         ArrayList crawlerArr = new ArrayList<>();
 
@@ -38,31 +44,22 @@ public class CrawlerService {
                 List<Crawler> crawlerList = new ArrayList<>();
                 Document doc = Jsoup.connect(urlStr).get();
 
-                //경로 추가
                 AtomicInteger idx = new AtomicInteger(0);
-                doc.select(".news_lst2 a[href]").stream()
-                        .map(link -> link.attr("href"))
-                        .forEach(s -> {
-                            Crawler crawler1 = new Crawler();
-                            crawler1.setUrl(s);
-                            crawlerList.add(idx.getAndIncrement(),crawler1);
-                        });
-
-                //이미지 추가
+                Elements elements1 = doc.select(".news_lst2 img[src]");
+                for (Element element : elements1) {
+                    //이미지 추가
+                    Crawler crawler = new Crawler();
+                    crawler.setImg(element.attr("src"));
+                    crawlerList.add(idx.getAndIncrement(),crawler);
+                }
                 idx.set(0);
-                doc.select(".news_lst2 img[src]").stream()
-                        .map(image -> image.attr("src"))
-                        .forEach(s -> {
-                            crawlerList.get(idx.getAndIncrement()).setImg(s);
-                        });
-
-                //타이틀 추가
-                idx.set(0);
-                doc.select(".news_lst2 .tit_area > a[href]").stream()
-                        .map(image -> image.childNode(0).toString())
-                        .forEach(s ->{
-                            crawlerList.get(idx.getAndIncrement()).setTitle(s);
-                        });
+                Elements elements2 = doc.select(".news_lst2 .tit_area > a[href]");
+                for (Element element : elements2) {
+                    //경로 추가
+                    crawlerList.get(idx.get()).setUrl(entertainLink + element.attr("href"));
+                    //타이틀 추가
+                    crawlerList.get(idx.getAndIncrement()).setTitle(element.childNode(0).toString());
+                }
 
                 //중복 데이터 검증후 리스트에 추가
                 List<Crawler> refineCrawlerList = validateDuplicateCrawlerData(crawlerList);
@@ -91,7 +88,9 @@ public class CrawlerService {
                 .filter(i -> crawlerList.get(i).getTitle() == null)
                 .boxed()
                 .sorted((i1, i2) -> Integer.compare(i2, i1))
-                .forEach(index -> crawlerList.remove((int) index));
+                .forEach(integer -> {
+                    crawlerList.remove((int)integer);
+                });
 
         return crawlerList;
     }
@@ -100,8 +99,8 @@ public class CrawlerService {
      * 전체 데이터 조회
      * @return
      */
-    public List<Crawler> findCrawlingData(){
-        return crawlerRepository.findAll();
+    public Page<Crawler> findCrawlingData(int page){
+        return crawlerRepository.findAll(PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "regDate")));
     }
     /*
 
