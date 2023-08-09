@@ -1,18 +1,16 @@
 package com.example.springboot.domain;
 
+
 import javax.persistence.*;
 
 @Entity
 public class Crawler {
 
     @Id
-    @Column(name = "url", nullable = false)
     private String url;
 
-    @Column(name = "img", nullable = true)
+    @Column
     private String img;
-
-    @Column(name = "title", nullable = true)
     private String title;
 
     public String getUrl() {
@@ -38,5 +36,4 @@ public class Crawler {
     public void setTitle(String title) {
         this.title = title;
     }
-
 }
