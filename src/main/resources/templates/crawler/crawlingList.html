@@ -30,17 +30,17 @@
                 <thead>
                 <tr>
                     <th>제목</th>
+                    <th>링크</th>
                     <th>연관단어</th>
                     <th>이미지</th>
-                    <th>링크</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="crawler : ${crawler}">
                     <td th:text="${crawler.title}"></td>
-                    <td th:text="${crawler.keyList}"></td>
-                    <td th:text="${crawler.imgLink}"></td>
-                    <td th:text="${crawler.urlLink}"></td>
+                    <td><a th:href="@{https://entertain.naver.com(${crawler.url})}"></a>ddd</td>
+                    <td><img th:src="${crawler.img}" alt="첨부이미지" th:if="${crawler.img != null}"/></td>
+                    <td></td>
                 </tr>
                 </tbody>
             </table>
