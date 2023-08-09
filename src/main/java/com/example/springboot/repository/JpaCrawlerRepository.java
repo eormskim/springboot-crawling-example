@@ -2,17 +2,12 @@ package com.example.springboot.repository;
 
 import com.example.springboot.domain.Crawler;
 import com.example.springboot.domain.Member;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
 @Transactional
 public class JpaCrawlerRepository implements CrawlerRepository{
@@ -23,13 +18,12 @@ public class JpaCrawlerRepository implements CrawlerRepository{
         this.em = em;
     }
 
-    /*@Override
-    public List<Crawler> save(Crawler crawler) {
-        //em.persist(crawler);
 
-        return null;
-    }*/
-
+    @Override
+    public Crawler save(Crawler crawler) {
+        em.persist(crawler);
+        return crawler;
+    }
 
     @Override
     public Optional<Crawler> findByUrl(String url) {
@@ -37,5 +31,11 @@ public class JpaCrawlerRepository implements CrawlerRepository{
                 .setParameter("url", url)
                 .getResultList();
         return result.stream().findAny();
+    }
+
+    @Override
+    public List<Crawler> findAll() {
+        return em.createQuery("select d from Crawler d", Crawler.class)
+                .getResultList();
     }
 }

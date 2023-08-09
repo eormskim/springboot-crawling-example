@@ -28,76 +28,82 @@ public class CrawlerService {
      * @param
      * @return
      */
-    public List<Crawler> getData(){
+    public ArrayList crawling(){
         String[] url = {"https://entertain.naver.com/now"};
         Stream<String> urlStream = Arrays.stream(url);
-        List<Crawler> crawlerList = new ArrayList<>();
+        ArrayList crawlerArr = new ArrayList<>();
 
         urlStream.forEach(urlStr ->{
             try {
-                List<Crawler> crawler = new ArrayList<>();
+                List<Crawler> crawlerList = new ArrayList<>();
                 Document doc = Jsoup.connect(urlStr).get();
 
                 //경로 추가
                 AtomicInteger idx = new AtomicInteger(0);
-                System.out.println("Links on the page:");
-                doc.select(".news_lst a[href]").stream()
+                doc.select(".news_lst2 a[href]").stream()
                         .map(link -> link.attr("href"))
                         .forEach(s -> {
                             Crawler crawler1 = new Crawler();
                             crawler1.setUrl(s);
-                            crawler.add(idx.getAndIncrement(),crawler1);
+                            crawlerList.add(idx.getAndIncrement(),crawler1);
                         });
 
                 //이미지 추가
                 idx.set(0);
-                System.out.println("Images on the page:");
-                doc.select(".news_lst img[src]").stream()
+                doc.select(".news_lst2 img[src]").stream()
                         .map(image -> image.attr("src"))
                         .forEach(s -> {
-                            crawler.get(idx.getAndIncrement()).setImg(s);
+                            crawlerList.get(idx.getAndIncrement()).setImg(s);
                         });
 
                 //타이틀 추가
                 idx.set(0);
-                System.out.println("Title on the page:");
-                doc.select(".news_lst .tit_area > a[href]").stream()
+                doc.select(".news_lst2 .tit_area > a[href]").stream()
                         .map(image -> image.childNode(0).toString())
                         .forEach(s ->{
-                            crawler.get(idx.getAndIncrement()).setTitle(s);
+                            crawlerList.get(idx.getAndIncrement()).setTitle(s);
                         });
 
                 //중복 데이터 검증후 리스트에 추가
-                crawlerList.addAll(validateDuplicateCrawlerData(crawler));
+                List<Crawler> refineCrawlerList = validateDuplicateCrawlerData(crawlerList);
+                crawlerArr.addAll(refineCrawlerList);
+                refineCrawlerList.forEach(crawlerRepository::save);
+
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
-        //TODO:: DB에 데이터 저장
 
-        return crawlerList;
+
+        return crawlerArr;
     }
 
     private List<Crawler> validateDuplicateCrawlerData(List<Crawler> crawlerList) {
-        //중복 url 데이터 제거
-        IntStream.range(0, crawlerList.size()).forEach(idx ->{
+        //URL 중복인 경우 타이틀 NULL 처리
+        IntStream.range(0, crawlerList.size()).forEach(idx -> {
             crawlerRepository.findByUrl(crawlerList.get(idx).getUrl())
-                    .ifPresent(m ->{
-                        crawlerList.remove(idx);
-                    });
+                    .ifPresent(m ->crawlerList.get(idx).setTitle(null));
         });
+        //TITLE이 NULL인 목록 제거
+        IntStream.range(0, crawlerList.size())
+                .filter(i -> crawlerList.get(i).getTitle() == null)
+                .boxed()
+                .sorted((i1, i2) -> Integer.compare(i2, i1))
+                .forEach(index -> crawlerList.remove((int) index));
+
         return crawlerList;
     }
 
     /**
-     * 전체 회원 조회
+     * 전체 데이터 조회
      * @return
      */
-    /*public List<Crawler> findMembers(){
+    public List<Crawler> findCrawlingData(){
         return crawlerRepository.findAll();
     }
+    /*
 
     public Optional<Crawler> findOne(Long memberId){
         return crawlerRepository.findById(memberId);

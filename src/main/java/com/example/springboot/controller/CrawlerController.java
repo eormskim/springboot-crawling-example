@@ -24,15 +24,15 @@ public class CrawlerController {
 
     @GetMapping("/crawler")
     public String crawlerFrom(Model model){
-        List<Crawler> crawler = new ArrayList<>();
+        List<Crawler> crawler = crawlerService.findCrawlingData();
         model.addAttribute("crawler", crawler);
         return "crawler/crawlingList";
     }
 
     @PostMapping("/crawler/getCrawlerData")
     @ResponseBody
-    public List<Crawler> getCrawlerData(){
-        List<Crawler> crawlerList = crawlerService.getData();
+    public ArrayList getCrawlerData(){
+        ArrayList crawlerList = crawlerService.crawling();
         return crawlerList;
     }
 
