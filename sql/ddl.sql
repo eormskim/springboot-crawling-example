@@ -12,6 +12,7 @@ create table crawler
     url varchar2,
     img varchar2,
     title varchar2,
+    reg_date timestamp,
     primary key(url)
 );
 
