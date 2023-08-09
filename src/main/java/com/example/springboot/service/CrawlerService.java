@@ -44,21 +44,16 @@ public class CrawlerService {
                 List<Crawler> crawlerList = new ArrayList<>();
                 Document doc = Jsoup.connect(urlStr).get();
 
-                AtomicInteger idx = new AtomicInteger(0);
-                Elements elements1 = doc.select(".news_lst2 img[src]");
-                for (Element element : elements1) {
-                    //이미지 추가
+                Elements ele = doc.select(".news_lst2");
+                for(Element element : ele){
                     Crawler crawler = new Crawler();
-                    crawler.setImg(element.attr("src"));
-                    crawlerList.add(idx.getAndIncrement(),crawler);
-                }
-                idx.set(0);
-                Elements elements2 = doc.select(".news_lst2 .tit_area > a[href]");
-                for (Element element : elements2) {
+                    //이미지 추가
+                    crawler.setImg(element.select("img[src]").attr("src"));
                     //경로 추가
-                    crawlerList.get(idx.get()).setUrl(entertainLink + element.attr("href"));
+                    crawler.setUrl(entertainLink + element.select(".tit_area > a[href]").attr("href"));
                     //타이틀 추가
-                    crawlerList.get(idx.getAndIncrement()).setTitle(element.childNode(0).toString());
+                    crawler.setTitle(element.select(".tit_area > a[href]").get(0).childNode(0).toString());
+                    crawlerList.add(crawler);
                 }
 
                 //중복 데이터 검증후 리스트에 추가
